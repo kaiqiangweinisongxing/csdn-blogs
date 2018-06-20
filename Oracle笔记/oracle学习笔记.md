@@ -1,6 +1,6 @@
 # 数据库 #
 表之间的关系，表征数据之间的关系，比用文件系统更好管理数据。
-![图片](1.png)
+![图片](https://raw.githubusercontent.com/kaiqiangweinisongxing/csdn-blogs/master/Oracle笔记/1.png)
 流行的DBMS有Oracle、MySQL、SQL Server；
 SQL是大多数主流DBMS采用的标准查询语言。
 ####发展历程： 层次型->网状型->关系型。 ####
@@ -26,6 +26,8 @@ SQL是大多数主流DBMS采用的标准查询语言。
 - 删除数据后commit则无法使用rollback恢复。
 >### drop：
 >放到回收站里面
+>### commit：
+>DML操作要commit之后其他用户才能看得到。退出的时候自动commit。
 
 # Oracle #
 一般不会轻易在一个服务器上创建多个数据库，在一个数据库中，不同的项目由不同的用户访问，每一个用户拥有自身创建的数据库对象（表）。（即一个数据库，不同的用户管理不同的表。）
@@ -61,6 +63,56 @@ change，修改语句
 
 	del n
 >若报错，可能是用户没有session权限
+
+## 0、数据库
+### 0.1创建数据库 ###
+Database Configuration Assistant
+: - 创建数据库
+: - 配置数据库选件
+: - 删除数据库
+: - 管理数据库模板
+: 创建流程:<https://blog.csdn.net/ziwen00/article/details/6662716>
+
+配置：
+
+	G:\Oracle\product\10.1.0\Client_1\NETWORK\ADMIN\tnsname.ora，添加内容如下：
+
+	数据库名 =
+	  (DESCRIPTION =
+	    (ADDRESS_LIST =
+	      (ADDRESS = (PROTOCOL = TCP)(HOST = IP地址)(PORT = 端口号))
+	    )
+	    (CONNECT_DATA =
+	      (SERVICE_NAME = 数据库名)
+	    )
+	  )
+测试连接数据库是否成功：`tnsping 数据库名`
+
+登录：`sqlplus 用户名/密码@数据库`
+### 0.2导出导入表
+**DBA权限的用户才能导出导入表**
+
+1. 命令行导出导入：	
+	
+		imp 用户名/密码@数据库 file=dmp文件地址 full=y				
+		imp test2/test2@mjldb file=C:\Users\Administrator\Desktop\test_dmp.dmp full=y				//全部导入
+		imp test2/test2@mjldb file=C:\Users\Administrator\Desktop\test_dmp.dmp tables=(student,test1_table)     //导入指定的表
+		imp test2/test2@mjldb fromuser=test touser=test2 file=C:\Users\Administrator\Desktop\test_dmp.dmp tables=(student,test1_table)     //fromuse和touser可以不写
+	
+		exp 用户名/密码@数据库 file=dmp文件地址 full=y						
+		exp test/test@mjldb file=C:\Users\Administrator\Desktop\test_dmp.dmp full=y			//导出整个数据库，空库有70多M
+		exp "'sys/sys@mjldb as sysdba'" file=C:\Users\Administrator\Desktop\test_user.dmp owner=(用户1,用户2)	//导出数据库中两个用户的数据
+		exp test/test@mjldb file=C:\Users\Administrator\Desktop\test_dmp.dmp tables=(table1,table2) 	//导出指定的表
+	
+		//日志
+		log=C:\Users\Administrator\Desktop\log.txt  
+
+2. PL/SQL导出导入：
+
+		工具-导出表-选中需要导出的表-导出可执行文件：F:\app\Administrator\product\11.2.0\dbhome_1\BIN\exp.exe
+		
+		工具-导入表-导入可执行文件：F:\app\Administrator\product\11.2.0\dbhome_1\BIN\imp.exe
+
 
 
 
@@ -116,7 +168,7 @@ SQL*PLUS：与oracle数据库进行交互的客户端工具。
 	connect 用户名/密码;
 
 ## 2、常用数据类型 ##
-![](2.png)
+![](https://raw.githubusercontent.com/kaiqiangweinisongxing/csdn-blogs/master/Oracle笔记/2.png)
 
 - char型数据，后面自动用空格补齐
 ## 3、表操作 ##
@@ -216,7 +268,7 @@ SQL*PLUS：与oracle数据库进行交互的客户端工具。
 	select length('abc') from dual;
 
 ## 5、约束CONSTRAINT ##
-![](3.png)
+![](https://raw.githubusercontent.com/kaiqiangweinisongxing/csdn-blogs/master/Oracle笔记/3.png)
 > 外键的值允许为空，如果插入值，则必须能在父表中找到。先建父表再建子表。
 
 **创建表时添加约束：**
@@ -279,7 +331,7 @@ SQL*PLUS：与oracle数据库进行交互的客户端工具。
 
 
 ## 6、SQL查询语句 ##
-![](4.png)
+![](https://raw.githubusercontent.com/kaiqiangweinisongxing/csdn-blogs/master/Oracle笔记/4.png)
 #### （1）使用算术表达式 +-*/ ####
 	select 列名+20 from 表名;
 
@@ -307,7 +359,7 @@ SQL*PLUS：与oracle数据库进行交互的客户端工具。
 	WHERE OrderPrice>(SELECT AVG(OrderPrice) FROM Orders)
 	WHERE City LIKE '%lon%'
 	WHERE City NOT LIKE '%lon%'
-![](5.png)
+![](https://raw.githubusercontent.com/kaiqiangweinisongxing/csdn-blogs/master/Oracle笔记/5.png)
 #### （6）通配符 % _ ####
 - % ：0个或多个字符；
 - _ ：1个字符
@@ -386,7 +438,7 @@ SQL*PLUS：与oracle数据库进行交互的客户端工具。
 		concat(m,n)
 #### 2. 数字函数 ####
 
-![](6.png)
+![](https://raw.githubusercontent.com/kaiqiangweinisongxing/csdn-blogs/master/Oracle笔记/6.png)
 	
 **round：四舍五入**
 
@@ -401,7 +453,7 @@ SQL*PLUS：与oracle数据库进行交互的客户端工具。
 	trunc(5.89)   	 	 // 5
 	trunc(5.89,1)   	 // 5.8
 #### 3. 转换函数 ####
-![](8.png)
+![](https://raw.githubusercontent.com/kaiqiangweinisongxing/csdn-blogs/master/Oracle笔记/8.png)
 
 	//转换为日期
 	select to_date('2018-06-18','yyyy-MM-dd') from dual
@@ -415,7 +467,7 @@ SQL*PLUS：与oracle数据库进行交互的客户端工具。
 #### 4. 日期函数 ####
 	//获取系统时间
 	select sysdate from dual		//18-6月 -18
-![](7.png)
+![](https://raw.githubusercontent.com/kaiqiangweinisongxing/csdn-blogs/master/Oracle笔记/7.png)
 	
 	//求下个月最后一天
 	select last_day(add_mon ths(sysdate,1)) from dual
@@ -445,7 +497,7 @@ SQL*PLUS：与oracle数据库进行交互的客户端工具。
 	//sum求和，avg求均值
 	select sum(列名),avg(列名) from A
 ## 8、高级SQL查询 ##
-![](9.png)
+![](https://raw.githubusercontent.com/kaiqiangweinisongxing/csdn-blogs/master/Oracle笔记/9.png)
 
 	//两表联查
 	select a.sno,sname from student a join score c on a.sno=c.sno
@@ -558,12 +610,12 @@ SQL*PLUS：与oracle数据库进行交互的客户端工具。
 ## 10、视图 ##
 一个或多个表上的预定义查询。
 ### （1）优点 ###
-![](10.png)
+![](https://raw.githubusercontent.com/kaiqiangweinisongxing/csdn-blogs/master/Oracle笔记/10.png)
 - - -
 ### （2）创建语法 ###
-![](11.png)
+![](https://raw.githubusercontent.com/kaiqiangweinisongxing/csdn-blogs/master/Oracle笔记/11.png)
 - - -
-![](12.png)
+![](https://raw.githubusercontent.com/kaiqiangweinisongxing/csdn-blogs/master/Oracle笔记/12.png)
 - - -
 ### （3）创建视图 ###
 	create or replace noforce view v_emp ("empno","ename","sal") 
@@ -590,7 +642,7 @@ SQL*PLUS：与oracle数据库进行交互的客户端工具。
 	insert into v_emp values(001,'Jason',500)
 
 ## 11、PL/SQL编程 ##
-![](13.png)
+![](https://raw.githubusercontent.com/kaiqiangweinisongxing/csdn-blogs/master/Oracle笔记/13.png)
 ### (1)构成###
 1. declare部分
 
@@ -609,7 +661,7 @@ SQL*PLUS：与oracle数据库进行交互的客户端工具。
 - LOB类型变量
 
 #### <1>标量类型变量 ####
-![](14.png)
+![](https://raw.githubusercontent.com/kaiqiangweinisongxing/csdn-blogs/master/Oracle笔记/14.png)
 	
 	// into 关键词可以将select得到的数据赋值给变量
 	sum_number number(5);
@@ -627,12 +679,12 @@ SQL*PLUS：与oracle数据库进行交互的客户端工具。
 1. 记录类型
 	
 	可以存储多个标量值（即一行数据），结构与行相似。
-![](15.png)
+![](https://raw.githubusercontent.com/kaiqiangweinisongxing/csdn-blogs/master/Oracle笔记/15.png)
 2. 记录表类型
 	
 	允许用户在代码中使用“表”，以便存储多行数据。
 
-![](16.png)
+![](https://raw.githubusercontent.com/kaiqiangweinisongxing/csdn-blogs/master/Oracle笔记/16.png)
 
 	set serveroutput on
 	declare
@@ -743,7 +795,7 @@ SQL*PLUS：与oracle数据库进行交互的客户端工具。
 #### 12.2显式游标 ####
 当查询结果返回多于一行时，必须使用显式游标。
 声明->打开->检索->关闭
-![](17.png)
+![](https://raw.githubusercontent.com/kaiqiangweinisongxing/csdn-blogs/master/Oracle笔记/17.png)
 
 	declare
 		cursor mycur(m integer) is select id,name from student where id>m;		-- 定义游标
